@@ -1,0 +1,23 @@
+pipeline {
+  agent none
+  stages {
+    stage('Build on Ubuntu agent') {
+      agent { label 'ubuntu && linux' }
+      steps {
+        sh 'echo Running on: $(uname -a)'
+        sh 'whoami && java -version'
+        writeFile file: 'artifact.txt', text: 'Hello from Ubuntu agent'
+        archiveArtifacts artifacts: 'artifact.txt', fingerprint: true
+      }
+    }
+
+    stage('Test on Debian agent') {
+      agent { label 'debian && linux' }
+      steps {
+        sh 'echo Running on: $(uname -a)'
+        sh 'whoami && java -version'
+        sh 'echo tests passing'
+      }
+    }
+  }
+}

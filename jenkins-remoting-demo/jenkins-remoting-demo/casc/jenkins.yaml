@@ -1,0 +1,72 @@
+jenkins:
+  systemMessage: |
+    Jenkins Remoting demo — configured via JCasC.
+
+  # Isolation: no builds on controller
+  numExecutors: 0
+
+  slaveAgentPort: 50000
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "${JENKINS_ADMIN_PASS:-admin123}"
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  remotingSecurity:
+    enabled: true
+
+unclassified:
+  location:
+    url: "http://localhost:8080/"
+  csrfProtection:
+    enableProxyCompatibility: true
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope: SYSTEM
+              id: "agent-creds"
+              description: "SSH credentials for demo agents"
+              username: "jenkins"
+              password: "jenkins"
+
+nodes:
+  - permanent:
+      labelString: "linux ubuntu build"
+      mode: NORMAL
+      name: "agent-ubuntu"
+      numExecutors: 2
+      remoteFS: "/home/jenkins/agent"
+      launcher:
+        ssh:
+          host: "agent-ubuntu"
+          port: 22
+          credentialsId: "agent-creds"
+          jvmOptions: "-Xms256m -Xmx768m"
+          sshHostKeyVerificationStrategy:
+            manuallyTrustedKeyVerificationStrategy:
+              requireInitialManualTrust: false
+
+  - permanent:
+      labelString: "linux debian test"
+      mode: NORMAL
+      name: "agent-debian"
+      numExecutors: 2
+      remoteFS: "/home/jenkins/agent"
+      launcher:
+        ssh:
+          host: "agent-debian"
+          port: 22
+          credentialsId: "agent-creds"
+          jvmOptions: "-Xms256m -Xmx768m"
+          sshHostKeyVerificationStrategy:
+            manuallyTrustedKeyVerificationStrategy:
+              requireInitialManualTrust: false

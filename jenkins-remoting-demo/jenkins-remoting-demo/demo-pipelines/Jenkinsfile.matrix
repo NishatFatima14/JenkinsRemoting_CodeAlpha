@@ -1,0 +1,34 @@
+pipeline {
+  agent none
+  stages {
+    stage('Matrix by label') {
+      matrix {
+        axes {
+          axis {
+            name 'LABEL'
+            values 'ubuntu', 'debian'
+          }
+        }
+        agent { label "${LABEL} && linux" }
+        stages {
+          stage('Env') {
+            steps {
+              sh 'echo Node: $(hostname)'
+              sh 'uname -a'
+            }
+          }
+          stage('Build') {
+            steps {
+              sh 'echo building on $LABEL agent'
+            }
+          }
+        }
+        post {
+          always {
+            echo "Finished on ${LABEL}"
+          }
+        }
+      }
+    }
+  }
+}

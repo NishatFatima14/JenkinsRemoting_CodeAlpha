@@ -1,0 +1,17 @@
+pipeline {
+  agent none
+  stages {
+    stage('Parallel fan-out') {
+      parallel {
+        stage('Lint on Ubuntu') {
+          agent { label 'ubuntu && linux' }
+          steps { sh 'echo lint && sleep 2' }
+        }
+        stage('Unit tests on Debian') {
+          agent { label 'debian && linux' }
+          steps { sh 'echo unit tests && sleep 2' }
+        }
+      }
+    }
+  }
+}
